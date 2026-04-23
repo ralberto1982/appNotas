@@ -1,0 +1,11 @@
+{
+  "name": "appnotas",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently -n backend,frontend -c bgBlue.bold,bgGreen.bold \"npm start --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
