@@ -196,16 +196,4 @@ frontend/dist/
 
 ---
 
-## Solución de problemas
 
-**`database is locked`**
-El servidor anterior no se cerró limpiamente. Elimina el archivo de bloqueo:
-```bash
-rm -rf backend/notas.db.lock
-```
-
-**`ECONNREFUSED` en el proxy de Vite**
-El backend no está corriendo. Asegúrate de ejecutar `npm start` desde la raíz antes de usar el frontend.
-
-**Puerto 3001 en uso**
-Cambia el puerto en `backend/.env` y actualiza el proxy en `frontend/vite.config.js`.
