@@ -63,7 +63,7 @@ export default function NoteCard({ note, onEdit, onDelete }) {
           <span className="text-xs text-gray-400">{date}</span>
 
           {/* Actions */}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <button
               onClick={handlePDF}
               disabled={exporting}

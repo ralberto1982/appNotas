@@ -3,6 +3,7 @@ import Sidebar from '../components/Layout/Sidebar';
 import Header from '../components/Layout/Header';
 import NotesList from '../components/Notes/NotesList';
 import NoteEditor from '../components/Notes/NoteEditor';
+import AiChat from '../components/Notes/AiChat';
 import api from '../api/client';
 
 export default function Dashboard() {
@@ -12,8 +13,9 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingNote, setEditingNote] = useState(null);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [loading, setLoading] = useState(true);
+  const [standaloneAiOpen, setStandaloneAiOpen] = useState(false);
 
   const fetchNotes = useCallback(async () => {
     try {
@@ -42,8 +44,10 @@ export default function Dashboard() {
   useEffect(() => { fetchCategories(); }, [fetchCategories]);
   useEffect(() => { fetchNotes(); }, [fetchNotes]);
 
-  const openNew = () => { setEditingNote(null); setEditorOpen(true); };
-  const openEdit = (note) => { setEditingNote(note); setEditorOpen(true); };
+  const closeSidebarMobile = () => { if (window.innerWidth < 1024) setSidebarOpen(false); };
+
+  const openNew = () => { setEditingNote(null); setEditorOpen(true); closeSidebarMobile(); };
+  const openEdit = (note) => { setEditingNote(note); setEditorOpen(true); closeSidebarMobile(); };
 
   const closeEditor = () => {
     setEditorOpen(false);
@@ -64,21 +68,24 @@ export default function Dashboard() {
         categories={categories}
         notes={notes}
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={(id) => { setSelectedCategory(id); closeSidebarMobile(); }}
         onNewNote={openNew}
         onEditNote={openEdit}
         onCategoriesChange={fetchCategories}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {!editorOpen && (
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <div className="flex-1 flex overflow-hidden min-w-0">
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           <Header
             onToggleSidebar={() => setSidebarOpen((v) => !v)}
             searchQuery={searchQuery}
             onSearch={setSearchQuery}
+            onAiOpen={() => setStandaloneAiOpen((v) => !v)}
           />
 
-          <main className="flex-1 overflow-y-auto p-5 lg:p-7">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-7">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="font-display text-xl font-bold">
@@ -103,6 +110,11 @@ export default function Dashboard() {
               onNewNote={openNew}
             />
           </main>
+          </div>
+
+          {standaloneAiOpen && (
+            <AiChat onClose={() => setStandaloneAiOpen(false)} />
+          )}
         </div>
       )}
 
@@ -113,6 +125,7 @@ export default function Dashboard() {
             categories={categories}
             onClose={closeEditor}
             onSave={closeEditor}
+            onToggleSidebar={() => setSidebarOpen((v) => !v)}
           />
         </div>
       )}

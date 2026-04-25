@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Menu, Search, Sun, Moon, X } from 'lucide-react';
+import { Menu, Search, Sun, Moon, X, Sparkles } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
-export default function Header({ onToggleSidebar, searchQuery, onSearch }) {
+export default function Header({ onToggleSidebar, searchQuery, onSearch, onAiOpen }) {
   const { dark, toggle } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -24,7 +24,7 @@ export default function Header({ onToggleSidebar, searchQuery, onSearch }) {
       <div className="flex-1" />
 
       {/* Search */}
-      <div className={`flex items-center transition-all duration-300 ${searchOpen ? 'w-64' : 'w-auto'}`}>
+      <div className={`flex items-center transition-all duration-300 ${searchOpen ? 'w-full sm:w-64' : 'w-auto'}`}>
         {searchOpen ? (
           <div className="flex items-center w-full bg-gray-100 dark:bg-gray-800 rounded-xl px-3 py-1.5 gap-2">
             <Search size={15} className="text-gray-400 flex-shrink-0" />
@@ -52,6 +52,17 @@ export default function Header({ onToggleSidebar, searchQuery, onSearch }) {
           </button>
         )}
       </div>
+
+      {/* AI button */}
+      <button
+        onClick={onAiOpen}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold
+                   bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+        data-tip="Asistente IA"
+      >
+        <Sparkles size={15} />
+        <span className="hidden sm:inline">IA</span>
+      </button>
 
       {/* Theme toggle */}
       <button

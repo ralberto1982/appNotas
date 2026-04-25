@@ -10,6 +10,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/notes', require('./routes/notes'));
+app.use('/api/ai', require('./routes/ai'));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

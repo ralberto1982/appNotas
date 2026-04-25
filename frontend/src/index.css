@@ -206,6 +206,23 @@
   color: #9ca3af;
 }
 
+/* scrollbar hide for horizontal toolbar */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* canvas editor padding — desktop matches original 2.5cm/3cm, mobile is compact */
+.canvas-content-area {
+  padding: 1.25rem 1rem 3rem;
+}
+@media (min-width: 640px) {
+  .canvas-content-area {
+    padding-top: 2.5cm;
+    padding-left: 3cm;
+    padding-right: 3cm;
+    padding-bottom: 3cm;
+  }
+}
+
 /* tooltip via data-attr */
 [data-tip] { position: relative; }
 [data-tip]:hover::after {

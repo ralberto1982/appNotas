@@ -9,8 +9,9 @@ import FontFamily from '@tiptap/extension-font-family';
 import Highlight from '@tiptap/extension-highlight';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
-import { X, Save, FileDown, FileText, Palette, Check } from 'lucide-react';
+import { X, Save, FileDown, FileText, Palette, Check, Menu, Sparkles } from 'lucide-react';
 import EditorToolbar from './EditorToolbar';
+import AiPanel from './AiPanel';
 import FontSize from '../../extensions/FontSize';
 import { SlashCommands } from '../../extensions/SlashCommands';
 import LineHeight from '../../extensions/LineHeight';
@@ -28,13 +29,14 @@ const CANVAS_COLORS = [
   '#1a1d27','#0f1117','#1e1b4b',
 ];
 
-export default function NoteEditor({ note, categories, onClose, onSave }) {
+export default function NoteEditor({ note, categories, onClose, onSave, onToggleSidebar }) {
   const [title, setTitle] = useState(note?.title || '');
   const [categoryId, setCategoryId] = useState(note?.category_id || '');
   const [gradientIdx, setGradientIdx] = useState(note?.gradient_index ?? Math.floor(Math.random() * 12));
   const [canvasColor, setCanvasColor] = useState(note?.canvas_color || '#ffffff');
   const [showCanvasPicker, setShowCanvasPicker] = useState(false);
   const [showGradientPicker, setShowGradientPicker] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -166,6 +168,10 @@ export default function NoteEditor({ note, categories, onClose, onSave }) {
                       bg-white/70 dark:bg-[#1a1d27]/70 backdrop-blur-md
                       border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
 
+        <button onClick={onToggleSidebar} className="btn-icon text-gray-500" data-tip="Menú">
+          <Menu size={18} />
+        </button>
+
         <button onClick={onClose} className="btn-icon text-gray-500" data-tip="Cerrar">
           <X size={18} />
         </button>
@@ -263,13 +269,13 @@ export default function NoteEditor({ note, categories, onClose, onSave }) {
 
         {/* Export */}
         <button onClick={handlePDF} disabled={exporting} data-tip="Exportar PDF"
-                className="btn-icon text-gray-500 hover:text-accent">
+                className="hidden sm:flex btn-icon text-gray-500 hover:text-accent">
           {exporting
             ? <span className="w-4 h-4 border-2 border-accent/40 border-t-accent rounded-full animate-spin inline-block" />
             : <FileDown size={17} />}
         </button>
         <button onClick={() => exportToWord(title || 'Sin título', editor?.getHTML() || '')}
-                data-tip="Exportar Word" className="btn-icon text-gray-500 hover:text-blue-500">
+                data-tip="Exportar Word" className="hidden sm:flex btn-icon text-gray-500 hover:text-blue-500">
           <FileText size={17} />
         </button>
 
@@ -285,14 +291,38 @@ export default function NoteEditor({ note, categories, onClose, onSave }) {
       </div>
 
       {/* Toolbar */}
-      <EditorToolbar editor={editor} />
+      <EditorToolbar editor={editor} onAiOpen={() => setAiOpen((v) => !v)} />
 
-      {/* Canvas */}
-      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: canvasColor }}>
-        <div className="max-w-3xl mx-auto min-h-full"
-             style={{ paddingTop: '2.5cm', paddingLeft: '3cm', paddingRight: '3cm', paddingBottom: '3cm' }}>
-          <EditorContent editor={editor} className="prose-custom min-h-[calc(100vh-180px)]" />
+      {/* Canvas + AI panel */}
+      <div className="flex flex-1 overflow-hidden relative">
+
+        {/* Floating AI button */}
+        <button
+          onClick={() => setAiOpen((v) => !v)}
+          data-tip="Asistente IA"
+          className={`absolute top-4 left-4 z-30 w-fit h-fit flex items-center gap-2 px-4 py-3 rounded-2xl shadow-lg
+                      transition-all duration-200 hover:scale-105 active:scale-95
+                      ${aiOpen
+                        ? 'bg-accent text-white shadow-accent/30'
+                        : 'bg-white dark:bg-[#1a1d27] text-accent border border-accent/30 shadow-black/10 hover:shadow-accent/20'}`}
+        >
+          <Sparkles size={17} />
+          <span className="text-sm font-semibold">IA</span>
+        </button>
+
+        <div className="flex-1 overflow-y-auto" style={{ backgroundColor: canvasColor }}>
+          <div className="max-w-3xl mx-auto min-h-full canvas-content-area">
+            <EditorContent editor={editor} className="prose-custom min-h-[calc(100vh-180px)]" />
+          </div>
         </div>
+
+        {aiOpen && (
+          <AiPanel
+            editor={editor}
+            onClose={() => setAiOpen(false)}
+            onInsert={(text) => editor?.chain().focus().insertContentAt(editor.state.doc.content.size, '\n' + text).run()}
+          />
+        )}
       </div>
 
       {/* Status bar */}

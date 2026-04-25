@@ -4,7 +4,7 @@ import {
   Bold, Italic, Underline, Strikethrough,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
   List, ListOrdered, Quote, Code, Minus,
-  Link, Undo2, Redo2, Highlighter, Palette, Type, AlignVerticalJustifyStart,
+  Link, Undo2, Redo2, Highlighter, Palette, Type, AlignVerticalJustifyStart, Sparkles,
 } from 'lucide-react';
 
 const FONTS = [
@@ -59,12 +59,22 @@ function ToolBtn({ onClick, active, disabled, tip, children }) {
 
 function ColorPicker({ colors, onPick, onReset, label, Icon, activeColor }) {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
   const ref = useRef(null);
+
+  const handleOpen = (e) => {
+    e.preventDefault();
+    if (!open && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+    setOpen((v) => !v);
+  };
 
   return (
     <div className="relative" ref={ref}>
       <button
-        onMouseDown={(e) => { e.preventDefault(); setOpen((v) => !v); }}
+        onMouseDown={handleOpen}
         data-tip={label}
         className="toolbar-btn flex flex-col items-center gap-0.5 px-2"
       >
@@ -76,11 +86,14 @@ function ColorPicker({ colors, onPick, onReset, label, Icon, activeColor }) {
       </button>
 
       {open && (
-        <div
-          className="absolute top-full left-0 mt-1 p-3 rounded-xl shadow-xl
-                     bg-white dark:bg-[#1a1d27] border border-gray-200 dark:border-gray-700
-                     z-50 w-52"
-        >
+        <>
+          <div className="fixed inset-0 z-40" onMouseDown={() => setOpen(false)} />
+          <div
+            className="fixed p-3 rounded-xl shadow-xl
+                       bg-white dark:bg-[#1a1d27] border border-gray-200 dark:border-gray-700
+                       z-50 w-52"
+            style={{ top: pos.top, left: pos.left }}
+          >
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
             {label}
           </p>
@@ -123,13 +136,14 @@ function ColorPicker({ colors, onPick, onReset, label, Icon, activeColor }) {
               Quitar color
             </button>
           )}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-export default function EditorToolbar({ editor }) {
+export default function EditorToolbar({ editor, onAiOpen }) {
   // Re-renderiza el toolbar en cada cambio de selección o formato
   useEditorState({
     editor,
@@ -164,7 +178,8 @@ export default function EditorToolbar({ editor }) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 px-3 py-2
+    <div className="flex items-center gap-0.5 px-3 py-2
+                    overflow-x-auto overflow-y-visible scrollbar-hide
                     border-b border-gray-200 dark:border-gray-700
                     bg-gray-50 dark:bg-[#161820]">
 
@@ -335,6 +350,7 @@ export default function EditorToolbar({ editor }) {
       <ToolBtn tip="Enlace" active={editor.isActive('link')} onClick={setLink}>
         <Link size={15} />
       </ToolBtn>
+
     </div>
   );
 }

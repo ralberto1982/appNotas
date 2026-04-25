@@ -8,7 +8,7 @@ import api from '../../api/client';
 
 export default function Sidebar({
   open, categories, notes = [], selectedCategory, onSelectCategory,
-  onNewNote, onEditNote, onCategoriesChange,
+  onNewNote, onEditNote, onCategoriesChange, onClose,
 }) {
   const { user, logout } = useAuth();
   const [catOpen, setCatOpen] = useState(true);
@@ -73,7 +73,7 @@ export default function Sidebar({
       {open && (
         <div
           className="lg:hidden fixed inset-0 bg-black/40 z-30"
-          onClick={() => {}}
+          onClick={onClose}
         />
       )}
 
